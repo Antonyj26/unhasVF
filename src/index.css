@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --default-font-family: "Poppins", sans-serif;
+  --color-feedback-danger: #d03e3e;
+  --color-feedback-pending: #355ec5;
+  --color-feedback-done: #508b26;
+  --color-feedback-closed: #e3b4b0;
+}
