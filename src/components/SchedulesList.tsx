@@ -49,7 +49,7 @@ export function SchedulesList({ schedules }: SchedulesListProps) {
             </div>
           </div>
 
-          <Button>Editar</Button>
+          <Button>Editar ✏️</Button>
         </div>
       ))}
     </div>

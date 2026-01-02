@@ -1,4 +1,6 @@
-type Props = React.ComponentProps<"button">;
+type Props = React.ComponentProps<"button"> & {
+  isLoading?: boolean;
+};
 
 export function Button({ children, type = "button", ...rest }: Props) {
   return (

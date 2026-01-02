@@ -1,5 +1,9 @@
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { useState, useEffect } from "react";
+import { api } from "../services/api";
+import { AxiosError } from "axios";
+import { useAuth } from "../hooks/useAuth";
 
 export type ClientType = {
   id: string;
@@ -7,30 +11,32 @@ export type ClientType = {
   phone: string;
 };
 
-const clients: ClientType[] = [
-  {
-    id: "1",
-    name: "Vitória França",
-    phone: "(61) 99127-8207",
-  },
-  {
-    id: "2",
-    name: "Antony",
-    phone: "(61) 98888-7777",
-  },
-  {
-    id: "3",
-    name: "Maria Silva",
-    phone: "(61) 99999-0000",
-  },
-  {
-    id: "4",
-    name: "Fernanda Souza",
-    phone: "(61) 97777-2222",
-  },
-];
-
 export function Clients() {
+  const { session } = useAuth();
+  const [clients, setClients] = useState<ClientType[]>([]);
+
+  useEffect(() => {
+    async function fetchedClients() {
+      try {
+        if (!session) {
+          return;
+        }
+        const response = await api.get("/client/index");
+
+        const data = response.data;
+
+        setClients(data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.log(error);
+          alert(error.response?.data.message && "Erro ao carregar clientes");
+        }
+      }
+    }
+
+    fetchedClients();
+  }, [session]);
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
