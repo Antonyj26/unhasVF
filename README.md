@@ -1,69 +1,42 @@
-# React + TypeScript + Vite
+# Unhas VF - Sistema de Agendamentos 💅
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistema de gestão para manicures e pedicures, focado em agilidade no agendamento e controle de clientes. O projeto visa facilitar o dia a dia do salão com uma interface amigável e responsiva.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologias Utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Front-end
 
-## Expanding the ESLint configuration
+- **React** (Vite)
+- **TypeScript**
+- **Tailwind CSS** (Estilização e Responsividade)
+- **React Router DOM** (Navegação)
+- **SVG** (Ícones)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Back-end
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Node.js**
+- **Express** (API Rest)
+- **Prisma ORM** (Gerenciamento de Banco de Dados)
+- **Zod** (Validação de dados)
+- **JWT** (Autenticação)
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Infraestrutura / Banco de Dados
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **PostgreSQL**
+- **Docker & Docker Compose**
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ✨ Funcionalidades Atuais
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- [x] **Login de Administrador:** Acesso seguro ao sistema.
+- [x] **Dashboard:** Visão geral e ações rápidas.
+- [x] **Gestão de Agendamentos:**
+  - Listagem visual (Grid responsivo).
+  - Criação de agendamento (Data e Hora unificadas).
+  - Status coloridos (Pendente, Confirmado, etc).
+- [x] **Gestão de Clientes:**
+  - Listagem com busca.
+  - Cadastro de novo cliente (Modal).
+  - Edição de dados do cliente.
+  - Exclusão de cliente.

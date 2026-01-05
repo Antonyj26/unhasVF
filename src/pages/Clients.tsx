@@ -1,9 +1,11 @@
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { api } from "../services/api";
 import { AxiosError } from "axios";
 import { useAuth } from "../hooks/useAuth";
+import { NewClientModal } from "../components/NewClientModal";
+import { EditClientModal } from "../components/EditClientModal";
 
 export type ClientType = {
   id: string;
@@ -14,6 +16,9 @@ export type ClientType = {
 export function Clients() {
   const { session } = useAuth();
   const [clients, setClients] = useState<ClientType[]>([]);
+  const [NewClientModalOpen, setNewClientModalOpen] = useState(false);
+  const [EditClientModalOpen, setEditClientModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<ClientType | null>(null);
 
   useEffect(() => {
     async function fetchedClients() {
@@ -28,14 +33,31 @@ export function Clients() {
         setClients(data);
       } catch (error) {
         if (error instanceof AxiosError) {
-          console.log(error);
-          alert(error.response?.data.message && "Erro ao carregar clientes");
+          return alert(
+            error.response?.data.message && "Erro ao carregar clientes"
+          );
         }
       }
     }
 
     fetchedClients();
   }, [session]);
+
+  async function handleDelete(clientId: string) {
+    if (confirm("Tem certeza que deseja excluir esse cliente?")) {
+      try {
+        await api.delete(`/client/delete/${clientId}`);
+
+        window.location.reload();
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          return alert(
+            error.response?.data.message ?? "Erro ao excluir cliente"
+          );
+        }
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl">
@@ -45,7 +67,7 @@ export function Clients() {
         </h1>
 
         <div className="w-full md:w-auto">
-          <Button>Novo +</Button>
+          <Button onClick={() => setNewClientModalOpen(true)}>Novo +</Button>
         </div>
       </div>
       <div className=" bg-white sp-4 rounded-2xl flex gap-4 items-end">
@@ -81,12 +103,17 @@ export function Clients() {
 
               <div className="flex gap-2 ml-auto">
                 <button
+                  onClick={() => {
+                    setSelectedClient(client);
+                    setEditClientModalOpen(true);
+                  }}
                   className="p-2 text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
                   title="Editar"
                 >
                   ✏️
                 </button>
                 <button
+                  onClick={() => handleDelete(client.id)}
                   className="p-2 text-red-400 hover:bg-red-50 rounded-md transition-colors"
                   title="Excluir"
                 >
@@ -100,6 +127,22 @@ export function Clients() {
       {clients.length === 0 && (
         <div className="text-center py-20 opacity-50">
           <p>Nenhum cliente encontrado 😢</p>
+        </div>
+      )}
+      {NewClientModalOpen && (
+        <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+          <NewClientModal onClose={() => setNewClientModalOpen(false)} />
+        </div>
+      )}
+      {EditClientModalOpen && selectedClient && (
+        <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+          <EditClientModal
+            client={selectedClient}
+            onClose={() => {
+              setEditClientModalOpen(false);
+              setSelectedClient(null);
+            }}
+          />
         </div>
       )}
     </div>

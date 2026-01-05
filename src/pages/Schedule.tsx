@@ -2,23 +2,24 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import type { ClientType } from "./Clients";
-import { useState } from "react";
-
-const clients: ClientType[] = [
-  {
-    id: "1",
-    name: "Antony",
-    phone: "(61) 991278207",
-  },
-  {
-    id: "2",
-    name: "Vitória",
-    phone: "(61) 984551923",
-  },
-];
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
 
 export function Schedule() {
   const [selectedClient, setSelectedClient] = useState<ClientType | null>(null);
+  const [clients, setClients] = useState<ClientType[]>([]);
+
+  useEffect(() => {
+    async function fetchedClients() {
+      try {
+        const response = await api.get("/client/index");
+
+        setClients(response.data);
+      } catch (error) {}
+    }
+
+    fetchedClients();
+  }, []);
 
   function handleClientChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const idSelected = e.target.value;
