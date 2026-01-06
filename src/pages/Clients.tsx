@@ -1,6 +1,6 @@
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { AxiosError } from "axios";
 import { useAuth } from "../hooks/useAuth";

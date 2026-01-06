@@ -5,7 +5,7 @@ export type SchedulesType = {
   id: string;
   client: string;
   hour: string;
-  contact: number;
+  phone: number;
   date: string;
   service: "Manicure" | "Pedicure" | "Completo";
   status: "Confirmado" | "Pendente" | "Cancelado" | "Encerrado";
@@ -33,7 +33,7 @@ export function SchedulesList({ schedules }: SchedulesListProps) {
               <strong>Horário: </strong> {schedule.hour}
             </p>
             <p className="text-sm text-gray-600">
-              <strong>Contato: </strong> {schedule.contact}
+              <strong>Contato: </strong> {schedule.phone}
             </p>
             <p className="text-sm text-gray-600">
               <strong>Data: </strong> {schedule.date}

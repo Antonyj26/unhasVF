@@ -4,10 +4,30 @@ import { Select } from "../components/Select";
 import type { ClientType } from "./Clients";
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
+import { z, ZodError } from "zod";
+import { AxiosError } from "axios";
+import { useNavigate } from "react-router-dom";
+
+const createSchema = z.object({
+  date: z.coerce.date(),
+  status: z
+    .enum(["PENDENTE", "CONFIRMADO", "CANCELADO", "ENCERRADO"])
+    .optional()
+    .default("PENDENTE"),
+  service: z.enum(["MANICURE", "PEDICURE", "COMPLETO"]),
+  clientId: z.string().uuid(),
+  notes: z.string().nullable().optional(),
+});
 
 export function Schedule() {
   const [selectedClient, setSelectedClient] = useState<ClientType | null>(null);
   const [clients, setClients] = useState<ClientType[]>([]);
+  const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState("");
+  const [status, setStatus] = useState<string>("");
+  const [service, setService] = useState<string>("");
+  const [notes, setNotes] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchedClients() {
@@ -31,12 +51,52 @@ export function Schedule() {
     setSelectedClient(clienteEncontrado || null);
   }
 
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    try {
+      const dateTime = `${date}T${time}`;
+      if (!selectedClient) {
+        return alert("Selecione um cliente");
+      }
+
+      if (!date || !time) {
+        return alert("Informe data e hora");
+      }
+
+      const data = createSchema.parse({
+        date: dateTime,
+        status: "PENDENTE",
+        service,
+        clientId: selectedClient?.id,
+        notes,
+      });
+
+      await api.post("/scheduling/create", data);
+
+      alert("Agendamento criado com sucesso!");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(error.response?.data && "Erro ao criar agendamento");
+      }
+
+      if (error instanceof ZodError) {
+        return alert(error.issues[0].message);
+      }
+    } finally {
+      navigate("/schedules");
+    }
+  }
+
   return (
     <div className="flex flex-col gap pink-500">
       <h1 className="uppercase text-center mb-6 md:mb-10 text-[#9e737a] font-bold text-2xl hover:text-[#e3b4b0] transition-colors">
         Criar um agendamento 🥰
       </h1>
-      <form className="w-full flex flex-col gap-4 border p-4 md:p-8 border-[#9e737a] rounded-3xl shadow-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full flex flex-col gap-4 border p-4 md:p-8 border-[#9e737a] rounded-3xl shadow-lg"
+      >
         <Select
           legend="Selecione o Cliente"
           onChange={handleClientChange}
@@ -51,10 +111,18 @@ export function Schedule() {
 
         <div className="flex flex-col md:flex-row gap-4 w-full">
           <div className="w-full md:w-1/3">
-            <Input legend="Data" type="date" />
+            <Input
+              legend="Data"
+              type="date"
+              onChange={(e) => setDate(e.target.value)}
+            />
           </div>
           <div className="w-full md:w-1/3">
-            <Input legend="Hora" type="time" />
+            <Input
+              legend="Hora"
+              type="time"
+              onChange={(e) => setTime(e.target.value)}
+            />
           </div>
           <div className="w-full md:w-1/3">
             <Input
@@ -68,14 +136,15 @@ export function Schedule() {
         <Input
           legend="Observação"
           placeholder="Observações opcionais (caso a cliente peça algo específico)"
+          onChange={(e) => setNotes(e.target.value)}
         />
 
-        <Select legend="Serviço">
-          <option value="manicure">Manicure</option>
-          <option value="pedicure">Pedicure</option>
-          <option value="manicure e pedicure">Manicure e Pedicure</option>
+        <Select legend="Serviço" onChange={(e) => setService(e.target.value)}>
+          <option value="MANICURE">Manicure</option>
+          <option value="PEDICURE">Pedicure</option>
+          <option value="COMPLETO">Manicure e Pedicure</option>
         </Select>
-        <Button>Criar</Button>
+        <Button type="submit">Criar</Button>
       </form>
     </div>
   );

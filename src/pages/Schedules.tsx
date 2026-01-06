@@ -2,74 +2,40 @@ import { SchedulesList } from "../components/SchedulesList";
 import type { SchedulesType } from "../components/SchedulesList";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
-
-const schedules: SchedulesType[] = [
-  {
-    id: "1",
-    client: "Antony",
-    contact: 61991278207,
-    hour: "09:00",
-    date: "09/12/2025",
-    status: "Encerrado",
-    service: "Completo",
-  },
-  {
-    id: "2",
-    client: "Vitória",
-    contact: 61991278207,
-    hour: "10:00",
-    date: "09/12/2025",
-    status: "Pendente",
-    service: "Manicure",
-  },
-  {
-    id: "2",
-    client: "Vitória",
-    contact: 61991278207,
-    hour: "10:00",
-    date: "09/12/2025",
-    status: "Confirmado",
-    service: "Manicure",
-  },
-  {
-    id: "2",
-    client: "Vitória",
-    contact: 61991278207,
-    hour: "10:00",
-    date: "09/12/2025",
-    status: "Cancelado",
-    service: "Manicure",
-  },
-  {
-    id: "2",
-    client: "Vitória",
-    contact: 61991278207,
-    hour: "10:00",
-    date: "09/12/2025",
-    status: "Cancelado",
-    service: "Manicure",
-  },
-  {
-    id: "2",
-    client: "Vitória",
-    contact: 61991278207,
-    hour: "10:00",
-    date: "09/12/2025",
-    status: "Cancelado",
-    service: "Manicure",
-  },
-  {
-    id: "2",
-    client: "Vitória",
-    contact: 61991278207,
-    hour: "10:00",
-    date: "09/12/2025",
-    status: "Cancelado",
-    service: "Manicure",
-  },
-];
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+import { useAuth } from "../hooks/useAuth";
 
 export function Schedules() {
+  const [schedules, setSchedules] = useState<SchedulesType[]>([]);
+  const { session } = useAuth();
+
+  useEffect(() => {
+    async function fetchSchedules() {
+      const response = await api.get("/scheduling/index");
+
+      const formattedSchedules = response.data.map((schedule: any) => {
+        const dateObj = new Date(schedule.date);
+
+        return {
+          id: schedule.id,
+          client: schedule.client.name,
+          phone: schedule.client.phone,
+          date: dateObj.toLocaleDateString("pt-BR"),
+          hour: dateObj.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          service: schedule.service,
+          status: schedule.status,
+        };
+      });
+      setSchedules(formattedSchedules);
+    }
+
+    fetchSchedules();
+  }, [session]);
+
   return (
     <div className="border p-4 md:p-8 rounded-3xl shadow-lg border-[#9e737a]">
       <h1 className="uppercase text-center mb-10 font-bold text-[#9e737a] text-4xl hover:text-[#e3b4b0] transition-colors">
