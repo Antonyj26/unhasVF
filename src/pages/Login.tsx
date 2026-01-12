@@ -68,22 +68,22 @@ export function Login() {
         {state?.message}
       </p>
 
-      <div className="flex justify-end -mt-2">
+      {/* <div className="flex justify-end -mt-2">
         <a href="#" className="text-sm text-[#9e737a] hover:underline">
           Esqueceu a senha?
         </a>
-      </div>
+      </div> */}
 
       <Button type="submit" isLoading={isLoading}>
         Entrar
       </Button>
 
-      <p className="text-center text-sm text-gray-500 mt-4">
+      {/* <p className="text-center text-sm text-gray-500 mt-4">
         Ainda não tem uma conta?{" "}
         <a href="#" className="text-[#9e737a] font-bold hover:underline">
           Cadastre-se
         </a>
-      </p>
+      </p> */}
     </form>
   );
 }

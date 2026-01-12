@@ -34,7 +34,7 @@ export function Clients() {
       } catch (error) {
         if (error instanceof AxiosError) {
           return alert(
-            error.response?.data.message && "Erro ao carregar clientes"
+            error.response?.data.message && "Nenhum cliente encontrado"
           );
         }
       }

@@ -5,9 +5,16 @@ import { Button } from "../components/Button";
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
+import { EditScheduleModal } from "../components/EditScheduleModal";
+import { AxiosError } from "axios";
+import { fi } from "zod/v4/locales";
 
 export function Schedules() {
   const [schedules, setSchedules] = useState<SchedulesType[]>([]);
+  const [editScheduleModalOpen, setEditScheduleModalOpen] = useState(false);
+  const [scheduleToEdit, setScheduleToEdit] = useState<SchedulesType | null>(
+    null
+  );
   const { session } = useAuth();
 
   useEffect(() => {
@@ -28,6 +35,7 @@ export function Schedules() {
           }),
           service: schedule.service,
           status: schedule.status,
+          notes: schedule.notes,
         };
       });
       setSchedules(formattedSchedules);
@@ -35,6 +43,28 @@ export function Schedules() {
 
     fetchSchedules();
   }, [session]);
+
+  function handleEdit(schedule: SchedulesType) {
+    setScheduleToEdit(schedule);
+    setEditScheduleModalOpen(true);
+  }
+
+  async function handleDelete(scheduleId: string) {
+    if (confirm("Tem certeza que deseja excluir esse agendamento?")) {
+      try {
+        await api.delete(`scheduling/delete/${scheduleId}`);
+
+        window.location.reload();
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          return alert(error.response?.data.message);
+        }
+      } finally {
+        alert("Agendamento excluído com sucesso");
+        window.location.reload();
+      }
+    }
+  }
 
   return (
     <div className="border p-4 md:p-8 rounded-3xl shadow-lg border-[#9e737a]">
@@ -49,7 +79,22 @@ export function Schedules() {
           <Button>Pesquisar 🔍</Button>
         </div>
       </form>
-      <SchedulesList schedules={schedules} />
+      <SchedulesList
+        schedules={schedules}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+      {editScheduleModalOpen && scheduleToEdit && (
+        <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+          <EditScheduleModal
+            schedule={scheduleToEdit}
+            onClose={() => {
+              setEditScheduleModalOpen(false);
+              setScheduleToEdit(null);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

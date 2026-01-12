@@ -24,7 +24,6 @@ export function Schedule() {
   const [clients, setClients] = useState<ClientType[]>([]);
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState("");
-  const [status, setStatus] = useState<string>("");
   const [service, setService] = useState<string>("");
   const [notes, setNotes] = useState<string | null>(null);
   const navigate = useNavigate();

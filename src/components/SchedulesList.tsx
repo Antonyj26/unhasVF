@@ -7,15 +7,22 @@ export type SchedulesType = {
   hour: string;
   phone: number;
   date: string;
-  service: "Manicure" | "Pedicure" | "Completo";
-  status: "Confirmado" | "Pendente" | "Cancelado" | "Encerrado";
+  service: "MANICURE" | "PEDICURE" | "COMPLETO";
+  status: "PENDENTE" | "CONFIRMADO" | "CANCELADO" | "ENCERRADO";
+  notes?: string;
 };
 
 type SchedulesListProps = {
   schedules: SchedulesType[];
+  onEdit: (schedule: SchedulesType) => void;
+  onDelete: (scheduleId: string) => void;
 };
 
-export function SchedulesList({ schedules }: SchedulesListProps) {
+export function SchedulesList({
+  schedules,
+  onEdit,
+  onDelete,
+}: SchedulesListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
       {schedules.map((schedule) => (
@@ -25,8 +32,8 @@ export function SchedulesList({ schedules }: SchedulesListProps) {
         >
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-bold text-[#9e737a]">
-              Cliente:{" "}
-              <span className="text-black font-normal">{schedule.client}</span>
+              Cliente:
+              <span className="text-black font-normal"> {schedule.client}</span>
             </h3>
 
             <p className="text-sm text-gray-600">
@@ -44,12 +51,19 @@ export function SchedulesList({ schedules }: SchedulesListProps) {
             <p className="text-sm">
               <strong>Serviço: </strong> {schedule.service}
             </p>
+            {schedule.notes && (
+              <p className="text-sm">
+                <strong>Observações: </strong>
+                {schedule.notes}
+              </p>
+            )}
             <div className="flex justify-between items-center">
               <Status status={schedule.status} />
             </div>
           </div>
 
-          <Button>Editar ✏️</Button>
+          <Button onClick={() => onEdit(schedule)}>Editar ✏️</Button>
+          <Button onClick={() => onDelete(schedule.id)}>Excluir 🗑️</Button>
         </div>
       ))}
     </div>
