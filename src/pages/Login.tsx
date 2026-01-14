@@ -5,6 +5,8 @@ import { z, ZodError } from "zod";
 import { api } from "../services/api";
 import { AxiosError } from "axios";
 import { useAuth } from "../hooks/useAuth";
+import { alertSuccess } from "../utils/sweetAlert";
+import { Loading } from "../components/Loading";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "E-mail inválido" }),
@@ -25,6 +27,8 @@ export function Login() {
       const response = await api.post("/session", data);
 
       save(response.data);
+
+      await alertSuccess("Login realizado", "Seja bem-vinda! 😊");
     } catch (error) {
       if (error instanceof ZodError) {
         return { message: error.issues[0].message };
@@ -84,6 +88,7 @@ export function Login() {
           Cadastre-se
         </a>
       </p> */}
+      {isLoading && <Loading />}
     </form>
   );
 }

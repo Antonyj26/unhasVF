@@ -2,6 +2,7 @@ import { BrowserRouter } from "react-router";
 import { AppRoutes } from "./AppRoutes";
 import { AuthRoutes } from "./AuthRoutes";
 import { useAuth } from "../hooks/useAuth";
+import { Loading } from "../components/Loading";
 
 export function Routes() {
   const { session, isLoading } = useAuth();
@@ -12,6 +13,10 @@ export function Routes() {
     } else {
       return <AppRoutes />;
     }
+  }
+
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (

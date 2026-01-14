@@ -7,6 +7,12 @@ import { useState } from "react";
 import { api } from "../services/api";
 import { z, ZodError } from "zod";
 import { AxiosError } from "axios";
+import {
+  alertConfirm,
+  alertError,
+  alertSuccess,
+  alertLoading,
+} from "../utils/sweetAlert";
 
 type EditScheduleModalProps = {
   schedule: SchedulesType;
@@ -42,28 +48,42 @@ export function EditScheduleModal({
   const [notes, setNotes] = useState(schedule.notes);
 
   async function handleSave() {
-    if (confirm("Tem certeza que quer alterar esse agendamento?")) {
-      try {
-        const dateTime = `${date}T${hour}`;
-        const data = updateSchema.parse({
-          date: dateTime,
-          status,
-          service,
-          notes,
-        });
+    const result = await alertConfirm(
+      "Confirmar alteração",
+      "Tem certeza que deseja alterar esse agendamento?"
+    );
 
-        await api.patch(`scheduling/update/${schedule.id}`, data);
+    if (!result.isConfirmed) return;
 
-        onClose();
-        window.location.reload();
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          return alert(error.response?.data.message);
-        }
+    try {
+      alertLoading("Salvando alterações...");
+      const dateTime = `${date}T${hour}`;
+      const data = updateSchema.parse({
+        date: dateTime,
+        status,
+        service,
+        notes,
+      });
 
-        if (error instanceof ZodError) {
-          return alert(error.issues[0].message);
-        }
+      await api.patch(`scheduling/update/${schedule.id}`, data);
+
+      await alertSuccess("Atualizado!", "Agendamento atualizado com sucesso.");
+
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        alertError(
+          "Erro ao atualizar agendamento",
+          error.response?.data.message ??
+            "Não foi possível atualizar o agendamento"
+        );
+        return;
+      }
+
+      if (error instanceof ZodError) {
+        alertError("Erro de validação", error.issues[0].message);
+        return;
       }
     }
   }

@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import { useAuth } from "../hooks/useAuth";
 import { NewClientModal } from "../components/NewClientModal";
 import { EditClientModal } from "../components/EditClientModal";
+import { alertConfirm, alertError, alertSuccess } from "../utils/sweetAlert";
 
 export type ClientType = {
   id: string;
@@ -33,9 +34,7 @@ export function Clients() {
         setClients(data);
       } catch (error) {
         if (error instanceof AxiosError) {
-          return alert(
-            error.response?.data.message && "Nenhum cliente encontrado"
-          );
+          alertError("Erro", "Nenhum cliente encontrado");
         }
       }
     }
@@ -44,17 +43,25 @@ export function Clients() {
   }, [session]);
 
   async function handleDelete(clientId: string) {
-    if (confirm("Tem certeza que deseja excluir esse cliente?")) {
-      try {
-        await api.delete(`/client/delete/${clientId}`);
+    const result = await alertConfirm(
+      "Tem certeza?",
+      "Esse cliente será excluído permanentemente."
+    );
 
-        window.location.reload();
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          return alert(
-            error.response?.data.message ?? "Erro ao excluir cliente"
-          );
-        }
+    if (!result.isConfirmed) return;
+
+    try {
+      await api.delete(`/client/delete/${clientId}`);
+
+      await alertSuccess("Excluído!", "Cliente excluído com sucesso.");
+
+      window.location.reload();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        alertError(
+          "Erro ao excluir cliente",
+          "Não foi possível excluir o cliente"
+        );
       }
     }
   }
@@ -124,11 +131,11 @@ export function Clients() {
           </div>
         ))}
       </div>
-      {clients.length === 0 && (
-        <div className="text-center py-20 opacity-50">
-          <p>Nenhum cliente encontrado 😢</p>
-        </div>
-      )}
+
+      <div className="text-center py-20 opacity-50">
+        <p>Nenhum cliente encontrado 😢</p>
+      </div>
+
       {NewClientModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
           <NewClientModal onClose={() => setNewClientModalOpen(false)} />

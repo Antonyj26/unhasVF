@@ -6,6 +6,12 @@ import { useState } from "react";
 import { api } from "../services/api";
 import { ZodError, z } from "zod";
 import { AxiosError } from "axios";
+import {
+  alertConfirm,
+  alertError,
+  alertSuccess,
+  alertLoading,
+} from "../utils/sweetAlert";
 
 type EditClientModalProps = {
   onClose: () => void;
@@ -28,26 +34,35 @@ export function EditClientModal({ onClose, client }: EditClientModalProps) {
   const [phone, setPhone] = useState(client.phone);
 
   async function handleUpdate() {
-    if (confirm(`Tem certeza que deseja alterar ${name}?`)) {
+    const result = await alertConfirm(
+      "Confirmar alteração",
+      `Tem certeza que deseja alterar os dados de ${name}?`
+    );
+
+    if (!result.isConfirmed) return;
+
+    try {
+      alertLoading("Salvando alterações...");
       const data = updateSchema.parse({ name, phone });
 
       await api.patch(`/client/update/${client.id}`, data);
-
+      await alertSuccess("Atualizado!", "Cliente atualizado com sucesso.");
       onClose();
 
       window.location.reload();
-
-      try {
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          return alert(
-            error.response?.data.message ?? "Erro ao editar cliente"
-          );
-        }
-        if (error instanceof ZodError) {
-          return alert(error.issues[0].message);
-        }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        alertError(
+          "Erro ao editar cliente",
+          error.response?.data.message ?? "Não foi possível editar o cliente"
+        );
+        return;
       }
+      if (error instanceof ZodError) {
+        alertError("Erro de validação", error.issues[0].message);
+        return;
+      }
+      alertError("Erro inesperado", "Tente novamente");
     }
   }
 

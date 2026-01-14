@@ -7,7 +7,8 @@ import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
 import { EditScheduleModal } from "../components/EditScheduleModal";
 import { AxiosError } from "axios";
-import { fi } from "zod/v4/locales";
+import { alertConfirm, alertSuccess, alertError } from "../utils/sweetAlert";
+import { Loading } from "../components/Loading";
 
 export function Schedules() {
   const [schedules, setSchedules] = useState<SchedulesType[]>([]);
@@ -15,30 +16,40 @@ export function Schedules() {
   const [scheduleToEdit, setScheduleToEdit] = useState<SchedulesType | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
   const { session } = useAuth();
 
   useEffect(() => {
     async function fetchSchedules() {
-      const response = await api.get("/scheduling/index");
+      try {
+        setIsLoading(true);
 
-      const formattedSchedules = response.data.map((schedule: any) => {
-        const dateObj = new Date(schedule.date);
+        const response = await api.get("/scheduling/index");
 
-        return {
-          id: schedule.id,
-          client: schedule.client.name,
-          phone: schedule.client.phone,
-          date: dateObj.toLocaleDateString("pt-BR"),
-          hour: dateObj.toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          service: schedule.service,
-          status: schedule.status,
-          notes: schedule.notes,
-        };
-      });
-      setSchedules(formattedSchedules);
+        const formattedSchedules = response.data.map((schedule: any) => {
+          const dateObj = new Date(schedule.date);
+
+          return {
+            id: schedule.id,
+            client: schedule.client.name,
+            phone: schedule.client.phone,
+            date: dateObj.toLocaleDateString("pt-BR"),
+            hour: dateObj.toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            service: schedule.service,
+            status: schedule.status,
+            notes: schedule.notes,
+          };
+        });
+
+        setSchedules(formattedSchedules);
+      } catch (error) {
+        alertError("Erro", "Não foi possível carregar os agendamentos");
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchSchedules();
@@ -50,19 +61,26 @@ export function Schedules() {
   }
 
   async function handleDelete(scheduleId: string) {
-    if (confirm("Tem certeza que deseja excluir esse agendamento?")) {
-      try {
-        await api.delete(`scheduling/delete/${scheduleId}`);
+    const result = await alertConfirm(
+      "Tem certeza?",
+      "Esse agendamento será excluído permanentemente."
+    );
 
-        window.location.reload();
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          return alert(error.response?.data.message);
-        }
-      } finally {
-        alert("Agendamento excluído com sucesso");
-        window.location.reload();
+    if (!result.isConfirmed) return;
+
+    try {
+      await api.delete(`scheduling/delete/${scheduleId}`);
+      await alertSuccess("Excluído!", "Agendamento excluído com sucesso.");
+
+      window.location.reload();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        alertError(
+          "Erro",
+          error.response?.data.message ?? "Erro ao excluir agendamento"
+        );
       }
+      alertError("Erro inesperado", "Tente novamente");
     }
   }
 
@@ -79,11 +97,16 @@ export function Schedules() {
           <Button>Pesquisar 🔍</Button>
         </div>
       </form>
-      <SchedulesList
-        schedules={schedules}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <SchedulesList
+          schedules={schedules}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
+
       {editScheduleModalOpen && scheduleToEdit && (
         <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
           <EditScheduleModal

@@ -7,6 +7,7 @@ import { api } from "../services/api";
 import { z, ZodError } from "zod";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { alertError, alertLoading, alertSuccess } from "../utils/sweetAlert";
 
 const createSchema = z.object({
   date: z.coerce.date(),
@@ -54,14 +55,16 @@ export function Schedule() {
     e.preventDefault();
 
     try {
-      const dateTime = `${date}T${time}`;
       if (!selectedClient) {
-        return alert("Selecione um cliente");
+        return alertError("Error", "Selecione um cliente");
       }
 
       if (!date || !time) {
-        return alert("Informe data e hora");
+        alertError("Error!", "Selecione uma data e hora");
       }
+      alertLoading("Criando agendamento...");
+
+      const dateTime = `${date}T${time}`;
 
       const data = createSchema.parse({
         date: dateTime,
@@ -73,17 +76,23 @@ export function Schedule() {
 
       await api.post("/scheduling/create", data);
 
-      alert("Agendamento criado com sucesso!");
+      await alertSuccess(
+        "Agendamento criado!",
+        "O agendamento foi criado com sucesso."
+      );
+
+      navigate("/schedules");
     } catch (error) {
       if (error instanceof AxiosError) {
-        return alert(error.response?.data && "Erro ao criar agendamento");
+        alertError(
+          "Erro ao criar agendamento",
+          error.response?.data.message ?? "Não foi possível criar o agendamento"
+        );
       }
 
       if (error instanceof ZodError) {
-        return alert(error.issues[0].message);
+        alertError("Erro de validação", "Preencha todos os campos");
       }
-    } finally {
-      navigate("/schedules");
     }
   }
 

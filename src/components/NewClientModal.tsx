@@ -5,6 +5,12 @@ import { useState } from "react";
 import { api } from "../services/api";
 import { z, ZodError } from "zod";
 import { AxiosError } from "axios";
+import {
+  alertConfirm,
+  alertError,
+  alertSuccess,
+  alertLoading,
+} from "../utils/sweetAlert";
 
 type NewClientModalProps = {
   onClose: () => void;
@@ -21,25 +27,43 @@ const createSchema = z.object({
 });
 
 export function NewClientModal({ onClose }: NewClientModalProps) {
-  const [name, setName] = useState<string>();
-  const [phone, setPhone] = useState<string>();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
   async function createNewClient() {
-    if (confirm("Tem certeza que deseja criar esse cliente?")) {
-      try {
-        const data = createSchema.parse({ name, phone });
+    const result = await alertConfirm(
+      "Confirmar criação",
+      "Tem certeza que deseja criar esse cliente?"
+    );
 
-        await api.post("/client/create", data);
-        onClose();
-        window.location.reload();
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          return alert(error.response?.data.message ?? "Erro ao criar cliente");
-        }
-        if (error instanceof ZodError) {
-          return alert(error.issues[0].message);
-        }
+    if (!result.isConfirmed) return;
+
+    try {
+      alertLoading("Criando cliente...");
+      const data = createSchema.parse({ name, phone });
+
+      await api.post("/client/create", data);
+
+      await alertSuccess(
+        "Cliente criado!",
+        "O cliente foi criado com sucesso."
+      );
+
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        alertError(
+          "Erro ao criar cliente",
+          error.response?.data.message ?? "Não foi possível criar o cliente"
+        );
+        return;
       }
+      if (error instanceof ZodError) {
+        alertError("Erro de validação", error.issues[0].message);
+        return;
+      }
+      alertError("Erro inesperado", "Tente novamente");
     }
   }
 
