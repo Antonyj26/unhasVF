@@ -7,6 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import { NewClientModal } from "../components/NewClientModal";
 import { EditClientModal } from "../components/EditClientModal";
 import { alertConfirm, alertError, alertSuccess } from "../utils/sweetAlert";
+import { Loading } from "../components/Loading";
 
 export type ClientType = {
   id: string;
@@ -20,25 +21,33 @@ export function Clients() {
   const [NewClientModalOpen, setNewClientModalOpen] = useState(false);
   const [EditClientModalOpen, setEditClientModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<ClientType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchClient, setSearchClient] = useState("");
+
+  async function fetchedClients(name?: string) {
+    try {
+      setIsLoading(true);
+
+      if (!session) {
+        return;
+      }
+      const response = await api.get("/client/index", {
+        params: name ? { name } : {},
+      });
+
+      const data = response.data;
+
+      setClients(data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        alertError("Erro", "Nenhum cliente encontrado");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchedClients() {
-      try {
-        if (!session) {
-          return;
-        }
-        const response = await api.get("/client/index");
-
-        const data = response.data;
-
-        setClients(data);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alertError("Erro", "Nenhum cliente encontrado");
-        }
-      }
-    }
-
     fetchedClients();
   }, [session]);
 
@@ -79,62 +88,74 @@ export function Clients() {
       </div>
       <div className=" bg-white sp-4 rounded-2xl flex gap-4 items-end">
         <div className="flex-1">
-          <Input placeholder="Buscar por nome..." legend="Pesquisar clientes" />
+          <Input
+            placeholder="Buscar por nome..."
+            value={searchClient}
+            legend="Pesquisar clientes"
+            onChange={(e) => setSearchClient(e.target.value)}
+          />
         </div>
-        <button className="bg-[#9e737a] text-white p-3 rounded-md hover:bg-[#e3b4b0] transition-colors font-bold">
+        <button
+          className="bg-[#9e737a] text-white p-3 rounded-md hover:bg-[#e3b4b0] transition-colors font-bold"
+          onClick={() => fetchedClients(searchClient)}
+        >
           🔍
         </button>
       </div>
-      <div className="flex flex-col gap-3">
-        {clients.map((client) => (
-          <div
-            key={client.id}
-            className="group bg-white p-5 rounded-2xl shadow-sm border border-transparent hover:border-pink-200 hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-          >
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-pink-50 flex items-center justify-center text-[#9e737a] font-bold text-xl border border-pink-100">
-                {client.name.charAt(0)}
+      {isLoading ? (
+        <Loading />
+      ) : clients.length === 0 ? (
+        <div className="text-center py-20 opacity-50">
+          <p>Nenhum cliente encontrado 😢</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {clients.map((client) => (
+            <div
+              key={client.id}
+              className="group bg-white p-5 rounded-2xl shadow-sm border border-transparent hover:border-pink-200 hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-pink-50 flex items-center justify-center text-[#9e737a] font-bold text-xl border border-pink-100">
+                  {client.name.charAt(0)}
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-lg text-gray-800">
+                    {client.name}
+                  </h3>
+                </div>
               </div>
 
-              <div>
-                <h3 className="font-bold text-lg text-gray-800">
-                  {client.name}
-                </h3>
+              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg border border-gray-100 text-gray-600 text-sm font-mono">
+                  📞 {client.phone}
+                </div>
+
+                <div className="flex gap-2 ml-auto">
+                  <button
+                    onClick={() => {
+                      setSelectedClient(client);
+                      setEditClientModalOpen(true);
+                    }}
+                    className="p-2 text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
+                    title="Editar"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDelete(client.id)}
+                    className="p-2 text-red-400 hover:bg-red-50 rounded-md transition-colors"
+                    title="Excluir"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
-              <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg border border-gray-100 text-gray-600 text-sm font-mono">
-                📞 {client.phone}
-              </div>
-
-              <div className="flex gap-2 ml-auto">
-                <button
-                  onClick={() => {
-                    setSelectedClient(client);
-                    setEditClientModalOpen(true);
-                  }}
-                  className="p-2 text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
-                  title="Editar"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={() => handleDelete(client.id)}
-                  className="p-2 text-red-400 hover:bg-red-50 rounded-md transition-colors"
-                  title="Excluir"
-                >
-                  🗑️
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="text-center py-20 opacity-50">
-        <p>Nenhum cliente encontrado 😢</p>
-      </div>
+          ))}
+        </div>
+      )}
 
       {NewClientModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50 backdrop-blur-sm">

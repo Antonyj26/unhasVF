@@ -61,8 +61,11 @@ export function SchedulesList({
               <Status status={schedule.status} />
             </div>
           </div>
+          {!schedule.status.includes("CANCELADO") &&
+            !schedule.status.includes("ENCERRADO") && (
+              <Button onClick={() => onEdit(schedule)}>Editar ✏️</Button>
+            )}
 
-          <Button onClick={() => onEdit(schedule)}>Editar ✏️</Button>
           <Button onClick={() => onDelete(schedule.id)}>Excluir 🗑️</Button>
         </div>
       ))}

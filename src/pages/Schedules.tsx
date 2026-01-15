@@ -16,42 +16,45 @@ export function Schedules() {
   const [scheduleToEdit, setScheduleToEdit] = useState<SchedulesType | null>(
     null
   );
+  const [searchSchedule, setSearchSchedule] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { session } = useAuth();
 
-  useEffect(() => {
-    async function fetchSchedules() {
-      try {
-        setIsLoading(true);
+  async function fetchSchedules(date?: string) {
+    try {
+      setIsLoading(true);
 
-        const response = await api.get("/scheduling/index");
+      const response = await api.get("/scheduling/index", {
+        params: date ? { date } : {},
+      });
 
-        const formattedSchedules = response.data.map((schedule: any) => {
-          const dateObj = new Date(schedule.date);
+      const formattedSchedules = response.data.map((schedule: any) => {
+        const dateObj = new Date(schedule.date);
 
-          return {
-            id: schedule.id,
-            client: schedule.client.name,
-            phone: schedule.client.phone,
-            date: dateObj.toLocaleDateString("pt-BR"),
-            hour: dateObj.toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            service: schedule.service,
-            status: schedule.status,
-            notes: schedule.notes,
-          };
-        });
+        return {
+          id: schedule.id,
+          client: schedule.client.name,
+          phone: schedule.client.phone,
+          date: dateObj.toLocaleDateString("pt-BR"),
+          hour: dateObj.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          service: schedule.service,
+          status: schedule.status,
+          notes: schedule.notes,
+        };
+      });
 
-        setSchedules(formattedSchedules);
-      } catch (error) {
-        alertError("Erro", "Não foi possível carregar os agendamentos");
-      } finally {
-        setIsLoading(false);
-      }
+      setSchedules(formattedSchedules);
+    } catch (error) {
+      alertError("Erro", "Não foi possível carregar os agendamentos");
+    } finally {
+      setIsLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchSchedules();
   }, [session]);
 
@@ -91,14 +94,32 @@ export function Schedules() {
       </h1>
       <form className="flex items-end gap-3 mb-10 w-full">
         <div className="flex-1">
-          <Input type="date" legend="Pesquisar Agendamentos" />
+          <Input
+            type="date"
+            legend="Pesquisar Agendamentos"
+            value={searchSchedule}
+            onChange={(e) => setSearchSchedule(e.target.value)}
+          />
         </div>
         <div className="w-32">
-          <Button>Pesquisar 🔍</Button>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              fetchSchedules(searchSchedule);
+            }}
+          >
+            Pesquisar 🔍
+          </Button>
         </div>
       </form>
       {isLoading ? (
         <Loading />
+      ) : schedules.length === 0 ? (
+        <div className="text-center py-20 opacity-60">
+          <p className="text-lg font-semibold">
+            Nenhum agendamento encontrado 😢
+          </p>
+        </div>
       ) : (
         <SchedulesList
           schedules={schedules}
