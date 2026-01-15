@@ -22,10 +22,14 @@ export function TopBar() {
     remove();
   }
   return (
-    <header className="w-full h-24 bg-[#e3b4b0] flex items-center justify-between px-10 shadow-md">
+    <header className="w-full h-24 bg-[#e3b4b0] flex items-center justify-between px-4 md:px-10 shadow-md">
       <div className="flex items-center h-full">
         <a href="/">
-          <img src={logo} className="h-20 object-contain" alt="Logo UnhasVF" />
+          <img
+            src={logo}
+            className="h-12 md:h-20 object-contain"
+            alt="Logo UnhasVF"
+          />
         </a>
       </div>
 
