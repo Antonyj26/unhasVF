@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://unhas-vf.vercel.app",
+  baseURL: "https://unhasvf-api.onrender.com",
 });
 
 api.interceptors.request.use((config) => {
