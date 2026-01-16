@@ -72,3 +72,47 @@ O sistema foi desenvolvido com foco em:
 - Smartphones
 
 Garantindo boa experiência em diferentes tamanhos de tela.
+
+## 📸 Screenshots do Sistema
+
+Abaixo algumas telas do sistema em funcionamento, demonstrando a experiência real de uso.
+
+---
+
+### 🔐 Tela de Login
+
+<p align="center">
+  <img src="./docs/images/login.png" alt="Tela de Login" width="700"/>
+</p>
+
+### Tela de Inicial 🏠
+
+<p align="center">
+  <img src="./docs/images/home.png" alt="Tela de Inicial" width="700"/>
+</p>
+
+### 📅 Agendamentos
+
+<p align="center">
+  <img src="./docs/images/agendamentos.png" alt="Agendamentos" width="700"/>
+</p>
+
+### 👥 Clientes
+
+<p align="center">
+  <img src="./docs/images/clientes.png" alt="Clientes" width="700"/>
+</p>
+
+### ➕ 📅 Novo Agendamento
+
+<p align="center">
+  <img src="./docs/images/novo-agendamento.png" alt="Novo Agendamento" width="700"/>
+</p>
+
+### ➕ 👥 Novo Cliente
+
+<p align="center">
+  <img src="./docs/images/novo-cliente.png" alt="Novo Cliente" width="700"/>
+</p>
+
+---
