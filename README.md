@@ -1,42 +1,74 @@
-# Unhas VF - Sistema de Agendamentos 💅
+# 💅 Unhas VF — Sistema de Agendamentos
 
-Sistema de gestão para manicures e pedicures, focado em agilidade no agendamento e controle de clientes. O projeto visa facilitar o dia a dia do salão com uma interface amigável e responsiva.
+Aplicação web desenvolvida para **controle de agendamentos e clientes**, criada para **uso real em um pequeno negócio** da área de estética.
 
-## 🚀 Tecnologias Utilizadas
+O sistema foi pensado para facilitar o dia a dia no atendimento, permitindo visualizar, criar e gerenciar agendamentos de forma simples, rápida e organizada.
 
-### Front-end
-
-- **React** (Vite)
-- **TypeScript**
-- **Tailwind CSS** (Estilização e Responsividade)
-- **React Router DOM** (Navegação)
-- **SVG** (Ícones)
-
-### Back-end
-
-- **Node.js**
-- **Express** (API Rest)
-- **Prisma ORM** (Gerenciamento de Banco de Dados)
-- **Zod** (Validação de dados)
-- **JWT** (Autenticação)
-
-### Infraestrutura / Banco de Dados
-
-- **PostgreSQL**
-- **Docker & Docker Compose**
+> 📌 Projeto desenvolvido para uso da minha esposa, atendendo uma necessidade real de organização de agenda.
 
 ---
 
-## ✨ Funcionalidades Atuais
+## 🌐 Projeto em produção
 
-- [x] **Login de Administrador:** Acesso seguro ao sistema.
-- [x] **Dashboard:** Visão geral e ações rápidas.
-- [x] **Gestão de Agendamentos:**
-  - Listagem visual (Grid responsivo).
-  - Criação de agendamento (Data e Hora unificadas).
-  - Status coloridos (Pendente, Confirmado, etc).
-- [x] **Gestão de Clientes:**
-  - Listagem com busca.
-  - Cadastro de novo cliente (Modal).
-  - Edição de dados do cliente.
-  - Exclusão de cliente.
+🔗 Front-end: https://unhas-vf.vercel.app
+🔗 Back-end (API): https://unhasvf-api.onrender.com
+
+---
+
+## 🚀 Tecnologias Utilizadas
+
+### 🎨 Front-end
+
+- **React** (Vite)
+- **TypeScript**
+- **Tailwind CSS** — Estilização e responsividade
+- **React Router DOM** — Navegação entre páginas
+- **Axios** — Comunicação com a API
+- **SVG** — Ícones e assets visuais
+
+### 🔧 Back-end (API)
+
+- **Node.js**
+- **Express**
+- **Prisma ORM**
+- **PostgreSQL**
+- **Zod**
+- **JWT (Autenticação)**
+
+> 📎 O backend está disponível em um repositório separado.
+
+---
+
+## ✨ Funcionalidades
+
+### 🔐 Autenticação
+
+- Login seguro com JWT
+- Rotas protegidas
+
+### 📅 Agendamentos
+
+- Listagem visual e responsiva
+- Criação de agendamento com **data e hora unificadas**
+- Edição e exclusão de agendamentos
+- Controle de status (Pendente, Confirmado, Cancelado, Encerrado)
+
+### 👥 Clientes
+
+- Listagem de clientes
+- Busca por nome
+- Cadastro de novo cliente (Modal)
+- Edição de dados
+- Exclusão de cliente
+
+---
+
+## 📱 Responsividade
+
+O sistema foi desenvolvido com foco em:
+
+- Desktop
+- Tablets
+- Smartphones
+
+Garantindo boa experiência em diferentes tamanhos de tela.
