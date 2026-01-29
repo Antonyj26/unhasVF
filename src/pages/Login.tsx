@@ -68,7 +68,7 @@ export function Login() {
         placeholder="••••••"
       />
 
-      <p className="text-sm text-feedback-danger text-center  font-bold">
+      <p className="text-sm text-[#e3b4b0] text-center  font-bold">
         {state?.message}
       </p>
 
