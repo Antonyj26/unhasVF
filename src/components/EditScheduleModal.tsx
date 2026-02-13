@@ -50,7 +50,7 @@ export function EditScheduleModal({
   async function handleSave() {
     const result = await alertConfirm(
       "Confirmar alteração",
-      "Tem certeza que deseja alterar esse agendamento?"
+      "Tem certeza que deseja alterar esse agendamento?",
     );
 
     if (!result.isConfirmed) return;
@@ -76,7 +76,7 @@ export function EditScheduleModal({
         alertError(
           "Erro ao atualizar agendamento",
           error.response?.data.message ??
-            "Não foi possível atualizar o agendamento"
+            "Não foi possível atualizar o agendamento",
         );
         return;
       }
@@ -102,7 +102,7 @@ export function EditScheduleModal({
       </h1>
       <div className="flex flex-col gap-4">
         <Input
-          legend="Hora"
+          legend="Data"
           value={date}
           type="date"
           onChange={(e) => setDate(e.target.value)}
